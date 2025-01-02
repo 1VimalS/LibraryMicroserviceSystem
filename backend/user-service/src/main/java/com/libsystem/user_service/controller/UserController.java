@@ -21,8 +21,8 @@ public class UserController {
         return userService.getUserByUsername(username);
     }
 
-    @PutMapping("/{action}/{username}/{bookId}")
-    public ResponseEntity checkOutOrInBookId(@PathVariable String action, @PathVariable String username, @PathVariable int bookId) {
+    @PutMapping("/{username}/{action}/{bookId}")
+    public ResponseEntity checkOutOrInBookId(@PathVariable String username, @PathVariable String action, @PathVariable int bookId) {
         if (action.equals("checkout")) {
             return userService.checkoutBook(username, bookId);
         }

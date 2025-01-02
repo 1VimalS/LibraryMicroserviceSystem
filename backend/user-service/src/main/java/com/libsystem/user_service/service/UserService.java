@@ -32,7 +32,7 @@ public class UserService {
         List<Book> checkedOutBooks = new ArrayList<>();
         if (user.getCheckedOutBookIds() != null) {
             checkedOutBooks = user.getCheckedOutBookIds().stream()
-                    .map(id -> restTemplate.getForObject("http://localhost:8082/book/" + id, Book.class))
+                    .map(id -> restTemplate.getForObject("http://BOOK-SERVICE/book/" + id, Book.class))
                     .collect(Collectors.toList());
         }
         UserResponse userResponse = new UserResponse(
@@ -48,7 +48,7 @@ public class UserService {
         if (user == null) {
             return new ResponseEntity<>("Username " + username + " not found.", HttpStatus.NOT_FOUND);
         }
-        Book book = restTemplate.getForObject("http://localhost:8082/book/" + bookId, Book.class);
+        Book book = restTemplate.getForObject("http://BOOK-SERVICE/book/" + bookId, Book.class);
         if (book == null) {
             return new ResponseEntity<>("Book ID " + bookId + " not found.", HttpStatus.NOT_FOUND);
         }
@@ -56,7 +56,7 @@ public class UserService {
             return new ResponseEntity<>("Book ID " + bookId + " does not have any copies available.", HttpStatus.OK);
         }
         try {
-            restTemplate.put("http://localhost:8082/book/decrement/" + bookId, null);
+            restTemplate.put("http://BOOK-SERVICE/book/decrement/" + bookId, null);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to update book copies: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -70,12 +70,12 @@ public class UserService {
         if (user == null) {
             return new ResponseEntity<>("Username " + username + " not found.", HttpStatus.NOT_FOUND);
         }
-        Book book = restTemplate.getForObject("http://localhost:8082/book/" + bookId, Book.class);
+        Book book = restTemplate.getForObject("http://BOOK-SERVICE:8082/book/" + bookId, Book.class);
         if (book == null) {
             return new ResponseEntity<>("Book ID " + bookId + " not found.", HttpStatus.NOT_FOUND);
         }
         try {
-            restTemplate.put("http://localhost:8082/book/increment/" + bookId, null);
+            restTemplate.put("http://BOOK-SERVICE/book/increment/" + bookId, null);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to update book copies: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
