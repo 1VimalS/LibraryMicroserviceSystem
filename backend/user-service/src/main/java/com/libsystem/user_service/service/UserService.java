@@ -1,6 +1,7 @@
 package com.libsystem.user_service.service;
 
 import com.libsystem.user_service.entity.User;
+import com.libsystem.user_service.entity.LoginRequest;
 import com.libsystem.user_service.repository.UserRepository;
 import com.libsystem.user_service.dto.Book;
 import com.libsystem.user_service.dto.UserResponse;
@@ -22,7 +23,7 @@ public class UserService {
     private RestTemplate restTemplate;
     public ResponseEntity<?> addUser(User user) {
         userRepository.save(user);
-        return new ResponseEntity<>("User created", HttpStatus.OK);
+        return new ResponseEntity<>("User created", HttpStatus.CREATED);
     }
     public ResponseEntity<?> getUserByUsername(String username) {
         User user = userRepository.findByUsername(username).orElse(null);
@@ -41,6 +42,21 @@ public class UserService {
                 checkedOutBooks
         );
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> login(LoginRequest loginRequest) {
+        String username = loginRequest.getUsername();
+        String password = loginRequest.getPassword();
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null) {
+            return new ResponseEntity<>("Username " + username + " not found.", HttpStatus.NOT_FOUND);
+        }
+        if (!password.equals(user.getPassword())) {
+            return new ResponseEntity<>("Password incorrect", HttpStatus.UNAUTHORIZED);
+        }
+        else {
+            return new ResponseEntity<>("Accepted", HttpStatus.OK);
+        }
     }
 
     public ResponseEntity<?> checkoutBook(String username, int bookId) {

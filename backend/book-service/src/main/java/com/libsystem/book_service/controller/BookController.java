@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @CrossOrigin("*")
-@RequestMapping(value = "/book")
 @RestController
+@RequestMapping(value = "/book")
 public class BookController {
     @Autowired
     private BookService bookService;
