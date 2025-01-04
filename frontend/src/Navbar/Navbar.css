@@ -1,21 +1,27 @@
 .navbar {
-    display: flex;
-    justify-content: space-around;
-    background-color: #2196F3;
-    padding: 10px 0;
-  }
-  
-  .nav-button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #2196F3;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 4px;
-  }
-  
-  .nav-button:hover {
-    background-color: #1976D2;
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-around;
+  background-color: #2196F3;
+  padding: 10px 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #2196F3;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.nav-button:hover {
+  background-color: #1976D2;
+}

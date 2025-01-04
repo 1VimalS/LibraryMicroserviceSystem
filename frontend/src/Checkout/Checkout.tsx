@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios, { AxiosResponse } from "axios";
 import { useAuth } from "../AuthContext.tsx";
-import "./Checkout.css";
+import "../CheckInOut.css";
 import Navbar from "../Navbar/Navbar.tsx";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
@@ -57,25 +57,56 @@ const Checkout: React.FC = () => {
         }
 
         try {
-            selectedBooks.map(async id => {
-                const response: AxiosResponse = await axios.put(`${apiEndpoint}/user/${username}/checkout/${id}`);
-                if (response.status === 200) {
-                    setBooks(prev => {
-                        const updatedBooks = prev.filter(book => book.bookId !== id);
-                        localStorage.setItem("booksAddedToCheckout", JSON.stringify(updatedBooks));
-                        return updatedBooks;
-                    });
-                    setSelectedBooks(prev => prev.filter(bookId => bookId !== id));
+            // selectedBooks.map(async id => {
+            //     const response: AxiosResponse = await axios.put(`${apiEndpoint}/user/${username}/checkout/${id}`);
+            //     if (response.status === 200) {
+            //         setBooks(prev => {
+            //             const updatedBooks = prev.filter(book => book.bookId !== id);
+            //             localStorage.setItem("booksAddedToCheckout", JSON.stringify(updatedBooks));
+            //             return updatedBooks;
+            //         });
+            //         setSelectedBooks(prev => prev.filter(bookId => bookId !== id));
+            //     }
+            //     else {
+            //         MySwal.fire({
+            //             title: "Error",
+            //             text: `Failed to checkout book: ${response.statusText}`,
+            //             icon: "error"
+            //         });
+            //         return;
+            //     }
+            // })
+            // Sequential way of calling Endpoints due to non ACID
+            const checkoutBooks = async () => {
+                for (const id of selectedBooks) {
+                    try {
+                        const response: AxiosResponse = await axios.put(`${apiEndpoint}/user/${username}/checkout/${id}`);
+            
+                        if (response.status === 200) {
+                            setBooks(prev => {
+                                const updatedBooks: Book[] = prev.filter(book => book.bookId !== id);
+                                localStorage.setItem("booksAddedToCheckout", JSON.stringify(updatedBooks));
+                                return updatedBooks;
+                            });
+                            setSelectedBooks(prev => prev.filter(bookId => bookId !== id));
+                        } else {
+                            MySwal.fire({
+                                title: "Error",
+                                text: `Failed to checkout book: ${response.statusText}`,
+                                icon: "error"
+                            });
+                        }
+                    } catch (error: any) {
+                        MySwal.fire({
+                            title: "Error",
+                            text: `Failed to checkout book: ${error.message}`,
+                            icon: "error"
+                        });
+                        break;
+                    }
                 }
-                else {
-                    MySwal.fire({
-                        title: "Error",
-                        text: `Failed to checkout book: ${response.statusText}`,
-                        icon: "error"
-                    });
-                    return;
-                }
-            })
+            };
+            checkoutBooks();
 
             MySwal.fire({
                 title: "Success",
@@ -97,22 +128,31 @@ const Checkout: React.FC = () => {
     return (
         <>
             <Navbar />
-            <h1>Your Checkout List</h1>
-            <div className="checkout-list">
-                <ul>
-                {books.map(book => (
-                    <li key={book.bookId}>
-                    {book.name}, {book.author}, {book.genre}
-                    <input
-                        type="checkbox"
-                        checked={selectedBooks.includes(book.bookId)}
-                        onChange={() => handleCheckboxChange(book.bookId)}
-                    />
-                    </li>
-                ))}
-                </ul>
+            <div className="checkout-container">
+                <h1>Your Checkout List</h1>
+                <div className="checkout-list">
+                    <ul>
+                        {books.map((book) => (
+                            <li key={book.bookId}>
+                                <span>{book.name}</span>
+                                <span>{book.author}</span>
+                                <span>{book.genre}</span>
+                                <label className="checkbox-container">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedBooks.includes(book.bookId)}
+                                        onChange={() => handleCheckboxChange(book.bookId)}
+                                    />
+                                    <span className="checkmark"></span>
+                                </label>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+                <button className="checkout-btn" onClick={handleCheckout}>
+                    Checkout
+                </button>
             </div>
-            <button className="checkout-btn" onClick={handleCheckout}>Checkout</button>
         </>
     );
 };

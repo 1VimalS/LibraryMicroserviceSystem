@@ -92,8 +92,11 @@ const CheckoutButton: React.FC<CheckoutButtonProps> = ({ book, username, booksAd
   };
 
   return (
-    <button className="checkout-btn" onClick={handleClick}>
-      {!addedToCheckout ? <div className="checkout-message-unchecked">Add to Checkout</div> : <div className="checkout-message-checked">Added to Checkout</div>}
+    <button
+      className={`add-checkout-btn ${addedToCheckout ? 'checked' : 'unchecked'}`}
+      onClick={handleClick}
+    >
+      {!addedToCheckout ? <div>Add to Checkout</div> : <div>Added to Checkout</div>}
     </button>
   );
 }
@@ -124,17 +127,22 @@ const Home: React.FC = () => {
     fetchBooks();
   }, []);
 
-  const listBooks = books.map(book =>
-    <li key={book.bookId}>
-      {book.name} , {book.author}, {book.genre}, 
-      <CheckoutButton 
-        book={book}
-        username={username}
-        booksAddedToCheckout={booksAddedToCheckout}
-        setBooksAddedToCheckout={setBooksAddedToCheckout}
-      />
+  const listBooks = books.map((book) => (
+    <li key={book.bookId} className="book-row">
+      <span className="book-column">{book.name}</span>
+      <span className="book-column">{book.author}</span>
+      <span className="book-column">{book.genre}</span>
+      <span className="book-column">
+        <CheckoutButton
+          book={book}
+          username={username}
+          booksAddedToCheckout={booksAddedToCheckout}
+          setBooksAddedToCheckout={setBooksAddedToCheckout}
+        />
+      </span>
     </li>
-  );
+  ));
+  
 
   const handleAdd = async () => {
     const { value: formValues } = await MySwal.fire({
@@ -177,16 +185,25 @@ const Home: React.FC = () => {
   };
 
   return (
-      <>
-        <Navbar />
+    <>
+      <Navbar />
+      <div className="home-container">
         <h1>Welcome to Home, {username}!</h1>
-        <button className="add-book-btn"onClick={handleAdd}>Add Book</button>
+        <button className="add-book-btn" onClick={handleAdd}>
+          Add Book
+        </button>
         <div className="book-list">
-          <h3>Book Title, Author, Genre, Add</h3>
+          <div className="book-header">
+            <span className="book-column">Book Title</span>
+            <span className="book-column">Author</span>
+            <span className="book-column">Genre</span>
+            <span className="book-column">Action</span>
+          </div>
           <ul>{listBooks}</ul>
         </div>
-      </>
-  );
+      </div>
+    </>
+  );  
 };
 
 export default Home;
