@@ -2,6 +2,7 @@ package com.libsystem.book_service.controller;
 
 import com.libsystem.book_service.entity.Book;
 import com.libsystem.book_service.service.BookService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,22 +16,22 @@ public class BookController {
     private BookService bookService;
 
     @PostMapping
-    public Book addBook(@RequestBody Book book) {
+    public ResponseEntity addBook(@RequestBody Book book) {
         return bookService.addBook(book);
     }
 
     @GetMapping
-    public List<Book> getBooks() {
+    public ResponseEntity getBooks() {
         return bookService.getBooks();
     }
 
     @GetMapping("/{id}")
-    public Book getBookById(@PathVariable int id) {
+    public ResponseEntity getBookById(@PathVariable int id) {
         return bookService.getBookById(id);
     }
 
     @PutMapping("/{action}/{id}")
-    public Book updateBookCopy(@PathVariable String action, @PathVariable Integer id) {
+    public ResponseEntity updateBookCopy(@PathVariable String action, @PathVariable Integer id) {
         if (action.equals("increment")) {
             return bookService.incrementBookCopy(id);
         }

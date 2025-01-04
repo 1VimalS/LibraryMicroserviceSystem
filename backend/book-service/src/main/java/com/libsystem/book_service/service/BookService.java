@@ -3,6 +3,8 @@ package com.libsystem.book_service.service;
 import com.libsystem.book_service.entity.Book;
 import com.libsystem.book_service.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,38 +13,41 @@ public class BookService {
     @Autowired
     private BookRepository bookRepository;
 
-    public Book addBook(Book book) {
-        return bookRepository.save(book);
+    public ResponseEntity<?> addBook(Book book) {
+        bookRepository.save(book);
+        return new ResponseEntity<>("Book added", HttpStatus.CREATED);
     }
 
-    public List<Book> getBooks() {
-        return bookRepository.findAll();
+    public ResponseEntity<?> getBooks() {
+        return new ResponseEntity<>(bookRepository.findAll(), HttpStatus.OK);
     }
 
-    public Book getBookById(int id) {
-        return bookRepository.findById(id).orElse(null);
+    public ResponseEntity<?> getBookById(int id) {
+        return new ResponseEntity<>(bookRepository.findById(id).orElse(null), HttpStatus.OK);
     }
 
-    public Book decrementBookCopy(int id) {
+    public ResponseEntity<?> decrementBookCopy(int id) {
         Book book = bookRepository.findById(id).orElse(null);
         if (book == null) {
-            throw new RuntimeException("Book not found with id " + id);
+            return new ResponseEntity<>("Book not found with id " + id, HttpStatus.NOT_FOUND);
         }
         if (book.getNumCopies() <= 0) {
-            throw new RuntimeException("Number of copies is already 0 for book id " + id);
+            return new ResponseEntity<>("Number of copies is already 0 for book id " + id, HttpStatus.GONE);
         }
         else {
             book.setNumCopies(book.getNumCopies() - 1);
-            return bookRepository.save(book);
+            bookRepository.save(book);
+            return new ResponseEntity<>("Decremented", HttpStatus.OK);
         }
     }
 
-    public Book incrementBookCopy(int id) {
+    public ResponseEntity<?> incrementBookCopy(int id) {
         Book book = bookRepository.findById(id).orElse(null);
         if (book == null) {
-            throw new RuntimeException("Book not found with id " + id);
+            return new ResponseEntity<>("Book not found with id " + id, HttpStatus.NOT_FOUND);
         }
         book.setNumCopies(book.getNumCopies() + 1);
-        return bookRepository.save(book);
+        bookRepository.save(book);
+        return new ResponseEntity<>("Incremented", HttpStatus.OK);
     }
 }

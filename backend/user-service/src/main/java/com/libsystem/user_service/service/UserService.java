@@ -6,6 +6,7 @@ import com.libsystem.user_service.repository.UserRepository;
 import com.libsystem.user_service.dto.Book;
 import com.libsystem.user_service.dto.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,20 +65,45 @@ public class UserService {
         if (user == null) {
             return new ResponseEntity<>("Username " + username + " not found.", HttpStatus.NOT_FOUND);
         }
-        Book book = restTemplate.getForObject("http://BOOK-SERVICE/book/" + bookId, Book.class);
-        if (book == null) {
+        ResponseEntity<?> bookResponse = restTemplate.exchange(
+                "http://BOOK-SERVICE/book/" + bookId,
+                HttpMethod.GET,
+                null,
+                Book.class);
+
+        if (bookResponse.getStatusCode() != HttpStatus.OK || bookResponse.getBody() == null) {
             return new ResponseEntity<>("Book ID " + bookId + " not found.", HttpStatus.NOT_FOUND);
         }
+
+        Book book = (Book) bookResponse.getBody();
         if (book.getNumCopies() <= 0) {
-            return new ResponseEntity<>("Book ID " + bookId + " does not have any copies available.", HttpStatus.OK);
+            System.out.println("Book " + book.getName() + "has no more copies: " + book.getNumCopies());
+            return new ResponseEntity<>("Book ID " + bookId + " does not have any copies available.", HttpStatus.GONE);
         }
         try {
-            restTemplate.put("http://BOOK-SERVICE/book/decrement/" + bookId, null);
+            ResponseEntity<?> decrementResponse = restTemplate.exchange(
+                    "http://BOOK-SERVICE/book/decrement/" + bookId,
+                    HttpMethod.PUT,
+                    null,
+                    String.class);
+
+            if (decrementResponse.getStatusCode() != HttpStatus.OK) {
+                return new ResponseEntity<>("Failed to decrement book copies.", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to update book copies: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         user.getCheckedOutBookIds().add(bookId);
-        userRepository.save(user);
+        System.out.println("Updated User checkeOutBookIds: Size " + user.getCheckedOutBookIds().size());
+        for (int i : user.getCheckedOutBookIds()) {
+            System.out.println("Book ID: " + i);
+        }
+        try {
+            userRepository.save(user); // Save the updated user with version field
+        } catch (Exception e) {
+            System.out.println("Error during save: " + e.getMessage());
+            return new ResponseEntity<>("Error saving user", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         return new ResponseEntity<>("Book " + bookId + " checked out", HttpStatus.OK);
     }
 
@@ -86,12 +112,27 @@ public class UserService {
         if (user == null) {
             return new ResponseEntity<>("Username " + username + " not found.", HttpStatus.NOT_FOUND);
         }
-        Book book = restTemplate.getForObject("http://BOOK-SERVICE:8082/book/" + bookId, Book.class);
-        if (book == null) {
+        ResponseEntity<?> bookResponse = restTemplate.exchange(
+                "http://BOOK-SERVICE/book/" + bookId,
+                HttpMethod.GET,
+                null,
+                Book.class);
+
+        if (bookResponse.getStatusCode() != HttpStatus.OK || bookResponse.getBody() == null) {
             return new ResponseEntity<>("Book ID " + bookId + " not found.", HttpStatus.NOT_FOUND);
         }
+
+        Book book = (Book) bookResponse.getBody();
         try {
-            restTemplate.put("http://BOOK-SERVICE/book/increment/" + bookId, null);
+            ResponseEntity<?> incrementResponse = restTemplate.exchange(
+                    "http://BOOK-SERVICE/book/increment/" + bookId,
+                    HttpMethod.PUT,
+                    null,
+                    String.class);
+
+            if (incrementResponse.getStatusCode() != HttpStatus.OK) {
+                return new ResponseEntity<>("Failed to increment book copies.", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to update book copies: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -31,7 +31,6 @@ public class User {
     private String username;
     private String password;
     private List<Integer> checkedOutBookIds;
-
     public String getUserId() {
         return userId;
     }
