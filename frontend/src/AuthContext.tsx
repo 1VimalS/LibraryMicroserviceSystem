@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
 interface AuthContextType {
   username: string | null;
@@ -9,10 +9,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [username, setUsername] = useState<string | null>(localStorage.getItem("username"));
+  const [loading, setLoading] = useState<boolean>(true);
 
-  React.useEffect(() => {
-    setUsername(localStorage.getItem("username"));
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    setUsername(storedUsername); // Set the username after fetching from localStorage
+    setLoading(false); // Mark loading as false after fetching
   }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Or a spinner component
+  }
 
   return (
     <AuthContext.Provider value={{ username, setUsername }}>

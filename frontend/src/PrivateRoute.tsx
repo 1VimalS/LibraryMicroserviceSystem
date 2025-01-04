@@ -5,11 +5,10 @@ import { useAuth } from './AuthContext';
 const PrivateRoute: React.FC = () => {
   const { username } = useAuth();
 
-  if (!username) {
+  if (username === null) {
     return <Navigate to="/" replace />;
   }
   else {
-    console.log("PrivateRoute: username is " + username);
     return <Outlet />;
   }
   

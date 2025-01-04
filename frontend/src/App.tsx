@@ -5,6 +5,8 @@ import PrivateRoute from "./PrivateRoute";
 import Login from "./Login/Login";
 import Signup from "./Signup/Signup";
 import Home from "./Home/Home";
+import Checkout from "./Checkout/Checkout";
+import Checkin from "./Checkin/Checkin";
 
 const App: React.FC = () => {
   return (
@@ -17,8 +19,8 @@ const App: React.FC = () => {
 
           <Route element={<PrivateRoute />}>
             <Route path="/home" element={<Home />} />
-            <Route path="/checkout" element={<Home />} />
-            <Route path="/checkin" element={<Home />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/checkin" element={<Checkin />} />
           </Route>
         </Routes>
       </Router>
