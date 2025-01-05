@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +23,12 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
     public ResponseEntity<?> addUser(User user) {
-        userRepository.save(user);
+        String hashedPassword = passwordEncoder.encode(user.getPassword());
+        User hashedUser = new User(user.getUserId(), user.getUsername(), hashedPassword);
+        userRepository.save(hashedUser);
         return new ResponseEntity<>("User created", HttpStatus.CREATED);
     }
     public ResponseEntity<?> getUserByUsername(String username) {
@@ -52,7 +57,7 @@ public class UserService {
         if (user == null) {
             return new ResponseEntity<>("Username " + username + " not found.", HttpStatus.NOT_FOUND);
         }
-        if (!password.equals(user.getPassword())) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             return new ResponseEntity<>("Password incorrect", HttpStatus.UNAUTHORIZED);
         }
         else {
