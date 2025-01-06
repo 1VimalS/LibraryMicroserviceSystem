@@ -145,7 +145,7 @@ const Home: React.FC = () => {
   
 
   const handleAdd = async () => {
-    const { value: formValues } = await MySwal.fire({
+    const { value: formValues, isConfirmed } = await MySwal.fire({
       title: "Add a New Book",
       html: `
         <input id="name" class="swal2-input" placeholder="Book Name" />
@@ -154,16 +154,23 @@ const Home: React.FC = () => {
         <input id="numCopies" type="number" class="swal2-input" placeholder="Number of Copies" />
       `,
       focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: "Add",
+      cancelButtonText: "Cancel",
       preConfirm: () => {
         const name = (document.getElementById("name") as HTMLInputElement).value;
         const author = (document.getElementById("author") as HTMLInputElement).value;
         const genre = (document.getElementById("genre") as HTMLInputElement).value;
         const numCopies = parseInt((document.getElementById("numCopies") as HTMLInputElement).value);
+        if (!name || !author || !genre || isNaN(numCopies)) {
+          MySwal.showValidationMessage("Please fill in all the fields");
+          return false;
+        } 
         return { name, author, genre, numCopies };
       },
     });
 
-    if (formValues) {
+    if (isConfirmed && formValues) {
       try {
         const response = await axios.post(`${apiEndpoint}/book`, formValues);
         if (response.status === 201) {
