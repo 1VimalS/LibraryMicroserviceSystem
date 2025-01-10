@@ -18,5 +18,6 @@ An end-to-end full stack MVC application with a microservices-architecture based
 	<code><img width="50" src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/mongodb.png" alt="mongoDB" title="mongoDB"/></code>
 	<code><img width="50" src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/docker.png" alt="Docker" title="Docker"/></code>
 </div>
-## Architectural Diagram
-![image](libsystem-architecture.png)
+
+## Architectural Diagram:
+![image](./libsystem-architecture.png)
