@@ -19,4 +19,4 @@ An end-to-end full stack MVC application with a microservices-architecture based
 	<code><img width="50" src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/docker.png" alt="Docker" title="Docker"/></code>
 </div>
 ## Architectural Diagram
-![image](https://github.com/user-attachments/assets/90c87adf-3edf-408b-ae6c-86a57004db95)
+![image](libsystem-architecture.png)
