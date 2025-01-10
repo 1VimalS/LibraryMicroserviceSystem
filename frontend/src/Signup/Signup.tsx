@@ -3,6 +3,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Signup.css";
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 const Signup: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -11,7 +13,11 @@ const Signup: React.FC = () => {
 
   const handleSignup = async () => {
     try {
-      const response = await axios.post("http://localhost:8080/user/signup", { username, password });
+      const response = await axios.post(`${BASE_URL}/user/signup`, { username, password }, {
+        headers: {
+          'ngrok-skip-browser-warning': '1'
+        },
+      });
       if (response.status === 201) {
         navigate("/login");
       }

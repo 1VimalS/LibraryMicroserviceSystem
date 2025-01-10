@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
-const apiEndpoint = "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 type Book = {
   bookId: number,
@@ -24,7 +24,11 @@ const Checkin: React.FC = () => {
     useEffect(() => {
       const fetchCheckedOutBooks = async () => {
         try {
-          const response: AxiosResponse = await axios.get(`${apiEndpoint}/user/${username}`);
+          const response: AxiosResponse = await axios.get(`${BASE_URL}/user/${username}`, {
+            headers: {
+                'ngrok-skip-browser-warning': '1'
+              },
+          });
           if (response.status === 200) {
             setBooks(response.data.checkedOutBooks || []);
           }
@@ -73,7 +77,11 @@ const Checkin: React.FC = () => {
                 const failedBooks: string[] = [];
                 for (const book of selectedBookObjects) {
                     try {
-                        const response = await axios.put(`${apiEndpoint}/user/${username}/checkin/${book.bookId}`);
+                        const response = await axios.put(`${BASE_URL}/user/${username}/checkin/${book.bookId}`, {
+                            headers: {
+                                'ngrok-skip-browser-warning': '1'
+                              },
+                        });
                         if (response.status === 200) {
                             setBooks(prev => {
                                 const updatedBooks: Book[] = prev.filter(item => item.bookId !== book.bookId);

@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
-const apiEndpoint = "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 type Book = {
   bookId: number,
@@ -80,7 +80,11 @@ const Checkout: React.FC = () => {
             const checkoutBooks = async () => {
                 for (const id of selectedBooks) {
                     try {
-                        const response: AxiosResponse = await axios.put(`${apiEndpoint}/user/${username}/checkout/${id}`);
+                        const response: AxiosResponse = await axios.put(`${BASE_URL}/user/${username}/checkout/${id}`, {
+                            headers: {
+                                'ngrok-skip-browser-warning': '1'
+                              },
+                        });
             
                         if (response.status === 200) {
                             setBooks(prev => {

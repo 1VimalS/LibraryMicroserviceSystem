@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import './Login.css';
 import { useAuth } from "../AuthContext";
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 const Login: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -26,7 +28,7 @@ const Login: React.FC = () => {
     }
 
     try {
-      const response: AxiosResponse = await axios.post("http://localhost:8080/user/login", {
+      const response: AxiosResponse = await axios.post(`${BASE_URL}/user/login`, {
         username,
         password
       });

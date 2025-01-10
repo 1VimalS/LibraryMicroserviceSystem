@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
-const apiEndpoint = "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 type Book = {
   bookId: number,
@@ -43,7 +43,11 @@ const CheckoutButton: React.FC<CheckoutButtonProps> = ({ book, username, booksAd
           return;
         }
       try {
-        const userResponse: AxiosResponse<User> = await axios.get(`${apiEndpoint}/user/${username}`);
+        const userResponse: AxiosResponse<User> = await axios.get(`${BASE_URL}/user/${username}`, {
+          headers: {
+            'ngrok-skip-browser-warning': '1'
+          },
+        });
         if (userResponse.status === 200) {
           const userData = userResponse.data;
           if (userData && userData.checkedOutBooks.some(checkedOutBook => checkedOutBook.bookId === book.bookId)) {
@@ -112,9 +116,17 @@ const Home: React.FC = () => {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response: AxiosResponse<Book[]> = await axios.get(`${apiEndpoint}/book`);
-        if (response.status === 200) {
+        const response: AxiosResponse<Book[]> = await axios.get(`${BASE_URL}/book`, {
+          headers: {
+            'ngrok-skip-browser-warning': '1'
+          },
+        });
+        console.log("Books API Request: " + `${BASE_URL}/book`)
+        console.log("Books API Response: ", response.data);
+        if (response.status === 200 && Array.isArray(response.data)) {
           setBooks(response.data);
+        } else {
+          throw new Error("Invalid data format");
         }
       } catch (error: any) {
         await MySwal.fire({
@@ -127,21 +139,25 @@ const Home: React.FC = () => {
     fetchBooks();
   }, []);
 
-  const listBooks = books.map((book) => (
-    <li key={book.bookId} className="book-row">
-      <span className="book-column">{book.name}</span>
-      <span className="book-column">{book.author}</span>
-      <span className="book-column">{book.genre}</span>
-      <span className="book-column">
-        <CheckoutButton
-          book={book}
-          username={username}
-          booksAddedToCheckout={booksAddedToCheckout}
-          setBooksAddedToCheckout={setBooksAddedToCheckout}
-        />
-      </span>
-    </li>
-  ));
+  const listBooks = Array.isArray(books) && books.length > 0 ? (
+    books.map((book) => (
+      <li key={book.bookId} className="book-row">
+        <span className="book-column">{book.name}</span>
+        <span className="book-column">{book.author}</span>
+        <span className="book-column">{book.genre}</span>
+        <span className="book-column">
+          <CheckoutButton
+            book={book}
+            username={username}
+            booksAddedToCheckout={booksAddedToCheckout}
+            setBooksAddedToCheckout={setBooksAddedToCheckout}
+          />
+        </span>
+      </li>
+    ))
+  ) : (
+    <li>No books available</li>
+  );
   
 
   const handleAdd = async () => {
@@ -172,7 +188,11 @@ const Home: React.FC = () => {
 
     if (isConfirmed && formValues) {
       try {
-        const response = await axios.post(`${apiEndpoint}/book`, formValues);
+        const response = await axios.post(`${BASE_URL}/book`, formValues, {
+          headers: {
+            'ngrok-skip-browser-warning': '1'
+          },
+        });
         if (response.status === 201) {
           await MySwal.fire({
             icon: "success",
